@@ -1,8 +1,18 @@
 import base64
+from typing import Optional
 
 
 class HTTPRequest:
-    def __init__(self, method, host, path, auth=None, headers=None, body=""):
+    def __init__(
+        self,
+        method: str,
+        host: str,
+        path: str,
+        *,
+        auth: Optional[tuple[str, str]] = None,
+        headers: Optional[dict[str, str]] = None,
+        body: Optional[str] = "",
+    ):
         self.method = method
         self.host = host
         self.path = path

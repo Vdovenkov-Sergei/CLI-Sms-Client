@@ -1,5 +1,15 @@
+from typing import Optional
+
+
 class HTTPResponse:
-    def __init__(self, status_code, status_message, headers=None, body=""):
+    def __init__(
+        self,
+        status_code: int,
+        status_message: str,
+        *,
+        headers: Optional[dict[str, str]] = None,
+        body: Optional[str] = "",
+    ):
         self.status_code = status_code
         self.status_message = status_message
         self.headers = headers or {}
