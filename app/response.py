@@ -15,6 +15,10 @@ class HTTPResponse:
         self.headers = headers or {}
         self.body = body
 
+    @property
+    def status_line(self) -> str:
+        return f"HTTP/1.1 {self.status_code} {self.status_message}"
+
     @classmethod
     def from_bytes(cls, binary_data: bytes) -> "HTTPResponse":
         data = binary_data.decode()
@@ -39,8 +43,7 @@ class HTTPResponse:
         self.headers["Content-Length"] = str(len(self.body))
 
     def to_bytes(self) -> bytes:
-        status_line = f"HTTP/1.1 {self.status_code} {self.status_message}"
         self.__update_headers()
         headers = "\r\n".join(f"{key}: {value}" for key, value in self.headers.items())
-        http_response = f"{status_line}\r\n{headers}\r\n\r\n{self.body}"
+        http_response = f"{self.status_line}\r\n{headers}\r\n\r\n{self.body}"
         return http_response.encode()

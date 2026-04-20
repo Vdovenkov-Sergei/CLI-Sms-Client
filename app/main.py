@@ -1,5 +1,6 @@
 import argparse
 import socket
+import logging
 
 import toml
 from app.request import HTTPRequest
@@ -8,6 +9,13 @@ from app.response import HTTPResponse
 
 BUFF_SIZE = 4096
 CONFIG_FILENAME = "config.toml"
+
+logging.basicConfig(
+    filename="sms_sender.log",
+    level=logging.DEBUG,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger()
 
 
 def send_sms(
@@ -18,6 +26,8 @@ def send_sms(
     to_number: str,
     message: str,
 ) -> HTTPResponse:
+    logger.info("Sending SMS...")
+
     _, host_port = api_url.split("://", 1)
     host, port = host_port.split(":", 1)
     path = "/" + __name__
@@ -27,15 +37,23 @@ def send_sms(
 
     request = HTTPRequest("POST", host, path, auth=auth, body=body)
 
+    logging.info(f"Request: {request.request_line}")
+    logger.debug(f"Request Body: {request.body}")
+
     with socket.create_connection((host, int(port))) as sock:
         sock.sendall(request.to_bytes())
         response_data = sock.recv(BUFF_SIZE)
 
     response = HTTPResponse.from_bytes(response_data)
+
+    logger.info(f"Response: {response.status_line}")
+    logger.debug(f"Response Body: {response.body}")
     return response
 
 
 def main() -> None:
+    logger.info("Starting SMS sending process...")
+
     config = toml.load(CONFIG_FILENAME)
 
     parser = argparse.ArgumentParser(description="CLI for sending SMS")
@@ -59,6 +77,7 @@ def main() -> None:
 
     print(f"Response Code: {response.status_code}")
     print(f"Response Body: {response.body}")
+    logger.info("SMS sending process completed.")
 
 
 if __name__ == "__main__":

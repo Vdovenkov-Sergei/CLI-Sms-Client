@@ -20,6 +20,10 @@ class HTTPRequest:
         self.headers = headers or {}
         self.body = body
 
+    @property
+    def request_line(self) -> str:
+        return f"{self.method} {self.path} HTTP/1.1"
+
     @classmethod
     def from_bytes(cls, binary_data: bytes) -> "HTTPRequest":
         data = binary_data.decode()
@@ -58,8 +62,7 @@ class HTTPRequest:
         self.headers["Content-Length"] = str(len(self.body))
 
     def to_bytes(self) -> bytes:
-        request_line = f"{self.method} {self.path} HTTP/1.1"
         self.__update_headers()
         headers = "\r\n".join(f"{key}: {value}" for key, value in self.headers.items())
-        http_request = f"{request_line}\r\n{headers}\r\n\r\n{self.body}"
+        http_request = f"{self.request_line}\r\n{headers}\r\n\r\n{self.body}"
         return http_request.encode()
