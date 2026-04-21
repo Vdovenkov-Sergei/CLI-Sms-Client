@@ -36,7 +36,7 @@ class HTTPResponse:
         if blank_line_idx + 1 < len(lines):
             body = "\r\n".join(lines[blank_line_idx + 1 :])
 
-        return cls(status_code, status_message, headers, body)
+        return cls(status_code, status_message, headers=headers, body=body)
 
     def __update_headers(self):
         self.headers["Content-Type"] = "application/json"

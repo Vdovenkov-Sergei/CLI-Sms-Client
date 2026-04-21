@@ -49,7 +49,7 @@ class HTTPRequest:
                 decoded_credentials = base64.b64decode(encoded_credentials).decode()
                 auth = tuple(decoded_credentials.split(":", 1))
 
-        return cls(method, host, path, auth, headers, body)
+        return cls(method, host, path, auth=auth, headers=headers, body=body)
 
     def __update_headers(self) -> None:
         self.headers["Host"] = self.host

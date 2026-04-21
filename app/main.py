@@ -3,8 +3,8 @@ import socket
 import logging
 
 import toml
-from app.request import HTTPRequest
-from app.response import HTTPResponse
+from request import HTTPRequest
+from response import HTTPResponse
 
 
 BUFF_SIZE = 4096
@@ -22,18 +22,21 @@ def send_sms(
     api_url: str,
     username: str,
     password: str,
-    from_number: str,
-    to_number: str,
+    sender: str,
+    recipient: str,
     message: str,
 ) -> HTTPResponse:
     logger.info("Sending SMS...")
 
-    _, host_port = api_url.split("://", 1)
+    _, host_port_path = api_url.split("://", 1)
+    host_port, path = host_port_path.split("/", 1)
     host, port = host_port.split(":", 1)
-    path = "/" + __name__
+    path = "/" + path
 
     auth = (username, password)
-    body = f'{{"from": "{from_number}", "to": "{to_number}", "message": "{message}"}}'
+    body = (
+        f'{{"sender": "{sender}", "recipient": "{recipient}", "message": "{message}"}}'
+    )
 
     request = HTTPRequest("POST", host, path, auth=auth, body=body)
 
@@ -58,10 +61,10 @@ def main() -> None:
 
     parser = argparse.ArgumentParser(description="CLI for sending SMS")
     parser.add_argument(
-        "--from", dest="from_number", required=True, help="Sender phone number"
+        "--from", dest="sender", required=True, help="Sender phone number"
     )
     parser.add_argument(
-        "--to", dest="to_number", required=True, help="Recipient phone number"
+        "--to", dest="recipient", required=True, help="Recipient phone number"
     )
     parser.add_argument("--message", required=True, help="SMS message text")
     args = parser.parse_args()
@@ -70,8 +73,8 @@ def main() -> None:
         api_url=config["api_url"],
         username=config["username"],
         password=config["password"],
-        from_number=args.from_number,
-        to_number=args.to_number,
+        sender=args.sender,
+        recipient=args.recipient,
         message=args.message,
     )
 
