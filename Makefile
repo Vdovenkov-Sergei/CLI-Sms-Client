@@ -17,7 +17,7 @@ test:
 
 lint:
 	$(POETRY_CMD) ruff check $(SRC_CODE_DIR) --exclude=$(EXCLUDE)
-	$(POETRY_CMD) mypy $(SRC_CODE_DIR) --exclude=$(EXCLUDE)
+	$(POETRY_CMD) mypy $(SRC_CODE_DIR) $(if $(EXCLUDE),--exclude=$(EXCLUDE))
 
 clean:
 	find . -type d -name "__pycache__" ! -path "./.venv/*" -exec rm -rf {} +

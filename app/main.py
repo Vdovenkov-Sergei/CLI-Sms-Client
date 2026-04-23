@@ -1,11 +1,10 @@
 import argparse
-import socket
 import logging
+import socket
 
 import toml
 from request import HTTPRequest
 from response import HTTPResponse
-
 
 BUFF_SIZE = 4096
 CONFIG_FILENAME = "config.toml"

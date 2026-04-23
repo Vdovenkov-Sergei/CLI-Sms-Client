@@ -9,9 +9,9 @@ class HTTPRequest:
         host: str,
         path: str,
         *,
-        auth: Optional[tuple[str, str]] = None,
+        auth: Optional[tuple[str, ...]] = None,
         headers: Optional[dict[str, str]] = None,
-        body: Optional[str] = "",
+        body: str = "",
     ):
         self.method = method
         self.host = host

@@ -3,15 +3,48 @@ name = "cli-sms-client"
 version = "0.1.0"
 description = "CLI client for sending SMS"
 authors = [
-    {name = "Sergei Vdovenkov", email = "sivdovenkov.it@gmail.com"}
+    {name = "Sergei Vdovenkov",email = "vdovenkov2000@gmail.com"}
 ]
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "toml (>=0.10.2,<0.11.0)"
+    "toml[all] (>=0.10.2,<0.11.0)"
 ]
 
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.5"
+black = "^25.1.0"
+pytest-cov = "^6.1.0"
+mypy = "^1.15.0"
+isort = "^6.0.1"
+ruff = "^0.11.2"
+types-toml = "^0.10.8.20240310"
+
+[tool.isort]
+profile = "black"
+line_length = 120
+known_first_party = ["app"]
+
+[tool.mypy]
+strict = true
+warn_unused_configs = true
+ignore_missing_imports = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+explicit_package_bases = true
+
+[tool.black]
+line-length = 120 
+target-version = ['py311']
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "C"]

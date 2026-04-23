@@ -8,7 +8,7 @@ class HTTPResponse:
         status_message: str,
         *,
         headers: Optional[dict[str, str]] = None,
-        body: Optional[str] = "",
+        body: str = "",
     ):
         self.status_code = status_code
         self.status_message = status_message
@@ -36,9 +36,9 @@ class HTTPResponse:
         if blank_line_idx + 1 < len(lines):
             body = "\r\n".join(lines[blank_line_idx + 1 :])
 
-        return cls(status_code, status_message, headers=headers, body=body)
+        return cls(int(status_code), status_message, headers=headers, body=body)
 
-    def __update_headers(self):
+    def __update_headers(self) -> None:
         self.headers["Content-Type"] = "application/json"
         self.headers["Content-Length"] = str(len(self.body))
 
