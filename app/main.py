@@ -1,16 +1,21 @@
 import argparse
+import json
 import logging
 import socket
 
 import toml
 from request import HTTPRequest
 from response import HTTPResponse
+from rich.console import Console
+from rich.table import Table
 
 BUFF_SIZE = 4096
 CONFIG_FILENAME = "config.toml"
 
+console = Console()
+
 logging.basicConfig(
-    filename="sms_sender.log",
+    filename="sms-log.log",
     level=logging.DEBUG,
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
@@ -77,8 +82,19 @@ def main() -> None:
         message=args.message,
     )
 
-    print(f"Response Code: {response.status_code}")
-    print(f"Response Body: {response.body}")
+    table = Table(title="\nSMS Response", show_header=True, header_style="cyan")
+    status_style = "green" if response.status_code < 400 else "red"
+    table.add_column("Status Code", style=status_style)
+    table.add_column("Response Body", style="yellow")
+
+    try:
+        formatted_body = json.dumps(json.loads(response.body), indent=2)
+    except json.JSONDecodeError:
+        formatted_body = response.body
+
+    table.add_row(str(response.status_code), formatted_body)
+
+    console.print(table)
     logger.info("SMS sending process completed.")
 
 

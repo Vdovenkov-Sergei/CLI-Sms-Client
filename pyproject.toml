@@ -1,5 +1,5 @@
 [project]
-name = "cli-sms-client"
+name = "sms-cli-client"
 version = "0.1.0"
 description = "CLI client for sending SMS"
 authors = [
@@ -8,7 +8,8 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "toml[all] (>=0.10.2,<0.11.0)"
+    "toml[all] (>=0.10.2,<0.11.0)",
+    "rich (>=14.0.0,<15.0.0)"
 ]
 
 
