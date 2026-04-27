@@ -1,7 +1,7 @@
 import base64
 import binascii
 
-from exceptions import AuthenticationError
+from app.exceptions import AuthenticationError
 
 
 class HTTPBasicAuth:
@@ -17,8 +17,8 @@ class HTTPBasicAuth:
         try:
             encoded = base64.b64encode(f"{username}:{password}".encode()).decode()
             return f"Basic {encoded}"
-        except Exception as e:
-            raise AuthenticationError(f"Failed to encode credentials: {e}")
+        except (UnicodeEncodeError, binascii.Error) as err:
+            raise AuthenticationError(f"Failed to encode credentials: {err}")
 
     @staticmethod
     def decode(auth_header: str) -> tuple[str, str]:
