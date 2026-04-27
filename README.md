@@ -1,27 +1,11 @@
-# CLI SMS Client
+# SMS CLI Client
 
 This is a command-line tool for sending SMS messages via an API. It supports configuration via a `TOML` file, logs requests and responses, and provides a user-friendly console output using `rich`.
 
-## Prerequisites
+## Installation and Configuration
 
-Ensure you have the following installed on your system:
-- Python 3.11+
-- `make`
-- `poetry` package manager
-
-## Setup
-
-1. Clone the repository:
-   ```sh
-   git clone <repository-url>
-   cd <repository-folder>
-   ```
-
-2. Create a virtual environment and install dependencies:
-   ```sh
-   poetry install --no-root
-   ```
-
+1. Clone the repository: `git clone <repository-url>`
+2. Create a virtual environment and install dependencies: `poetry install --no-root`
 3. Configure the application by creating a `config.toml` file in the root directory:
    ```toml
    api_url = "http://localhost:4010/send_sms"
@@ -31,11 +15,18 @@ Ensure you have the following installed on your system:
 
 ## Running the Application
 
-To send an SMS, use the following command:
+To run the program, use the following command:
 
 ```sh
-make run FROM="Sender phone number" TO="Recipient phone number" MESSAGE="Your message here"
+make run SENDER="Sender" RECIPIENT="Recipient" MESSAGE="Message"
 ```
+
+You need to provide three arguments:
+- `SENDER`: The sender's phone number.
+- `RECIPIENT`: The recipient's phone number.
+- `MESSAGE`: The content of the SMS message
+
+This command will send the specified SMS from the sender to the recipient.
 
 ### Example Output
 ```
@@ -46,33 +37,13 @@ make run FROM="Sender phone number" TO="Recipient phone number" MESSAGE="Your me
 +-------------+-----------------------------------------------+
 ```
 
-## Other Commands in Makefile
+## Makefile commands
 
 The `Makefile` provides additional commands for convenience:
-
-- **Run tests**  
-  ```sh
-  make test
-  ```
-  Executes the test suite using `pytest`.
-
-- **Format the code**  
-  ```sh
-  make format
-  ```
-  Formats the code using `black` and `isort`.
-
-- **Lint the code**  
-  ```sh
-  make lint
-  ```
-  Runs `ruff` and `mypy` to check for code issues.
-
-- **Clean the project**  
-  ```sh
-  make clean
-  ```
-  Removes cache files and temporary build artifacts.
+- `make test` to execute the test suite using `pytest`.
+- `make format` to format the code using `black` and `isort`.
+- `make lint` to run `ruff` and `mypy` to check for code issues.
+- `make clean` to remove cache files and temporary build artifacts.
 
 ## Logging
 

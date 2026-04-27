@@ -10,7 +10,7 @@ format:
 	$(POETRY_CMD) isort $(SRC_CODE_DIR) --skip=$(EXCLUDE)
 
 run:
-	$(POETRY_CMD) python $(MAIN_APP) --from "$(FROM)" --to "$(TO)" --message "$(MESSAGE)"
+	$(POETRY_CMD) python $(MAIN_APP) --sender "$(SENDER)" --recipient "$(RECIPIENT)" --message "$(MESSAGE)"
 
 test:
 	$(POETRY_CMD) pytest -k "$(TEST_NAME)" -m "$(MARKERS)" -q --cov=$(SRC_CODE_DIR) --cov-report=term-missing
