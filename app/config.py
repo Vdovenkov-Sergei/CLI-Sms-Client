@@ -1,6 +1,7 @@
 from typing import Any
 
 import toml
+from exceptions import ConfigError
 
 
 class Config:
@@ -13,13 +14,13 @@ class Config:
             with open(self.config_file, "r") as file:
                 return toml.load(file)
         except FileNotFoundError:
-            raise ValueError(f"Config file '{self.config_file}' not found.")
+            raise ConfigError(f"Config file '{self.config_file}' not found.")
         except toml.TomlDecodeError:
             raise ValueError(f"Error parsing the TOML file '{self.config_file}'.")
 
     def get(self, key: str) -> Any:
         if key not in self.config_data:
-            raise ValueError(f"Missing required config key: '{key}'")
+            raise ConfigError(f"Missing required config key: '{key}'")
         return self.config_data[key]
 
 

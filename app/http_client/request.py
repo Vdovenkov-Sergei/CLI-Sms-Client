@@ -3,6 +3,7 @@ import re
 import socket
 from typing import Any, Optional, Union
 
+from exceptions import HTTPRequestError, NetworkError, SerializationError, ValidationError
 from http_client.http_message import HTTPRequest, HTTPResponse
 from http_client.schemas import HTTPBody
 from utils.logging import logger
@@ -14,12 +15,12 @@ class Request:
     @staticmethod
     def parse_url(url: str) -> tuple[str, str, int, str]:
         if not isinstance(url, str):
-            raise ValueError("URL must be a string")
+            raise HTTPRequestError("URL must be a string")
 
         pattern = re.compile(r"^(https?)://([^:/]+)(?::(\d+))?(/.*)?$", re.IGNORECASE)
         match = pattern.match(url)
         if not match:
-            raise ValueError(f"Invalid URL format: {url}")
+            raise HTTPRequestError(f"Invalid URL format: {url}")
 
         protocol = match.group(1)
         host = match.group(2)
@@ -30,7 +31,7 @@ class Request:
             try:
                 port = int(port_str)
             except ValueError:
-                raise ValueError(f"Invalid port number in URL: {port_str}")
+                raise HTTPRequestError(f"Invalid port number in URL: {port_str}")
         else:
             port = 443 if protocol == "https" else 80
 
@@ -43,7 +44,7 @@ class Request:
             try:
                 body = json.dumps(body)
             except TypeError as err:
-                raise ValueError(f"Error serializing body to JSON: {err}")
+                raise SerializationError(f"Error serializing body to JSON: {err}")
             headers.setdefault("Content-Type", "application/json")
         elif isinstance(body, HTTPBody):
             body = body.to_json()
@@ -51,7 +52,7 @@ class Request:
         elif isinstance(body, str):
             headers.setdefault("Content-Type", "text/plain")
         else:
-            raise ValueError(f"Unsupported body type: {type(body)}")
+            raise ValidationError(f"Unsupported body type: {type(body)}")
 
         return body, headers
 
@@ -64,26 +65,29 @@ class Request:
         headers: Optional[dict[str, str]] = None,
         body: Optional[Union[HTTPBody, dict[str, Any], str]] = None,
     ) -> HTTPResponse:
-        _, host, port, path = Request.parse_url(url)
-        body, body_headers = Request.prepare_body(body)
-        headers = {**(headers or {}), **body_headers}
-
-        request = HTTPRequest(method, host, path, auth=auth, headers=headers, body=body)
-        logger.info(f"Request: {request.start_line}")
-        if body:
-            logger.debug(f"Request Body: {request.body}")
-
         try:
+            _, host, port, path = Request.parse_url(url)
+            body, body_headers = Request.prepare_body(body)
+            headers = {**(headers or {}), **body_headers}
+
+            request = HTTPRequest(method, host, path, auth=auth, headers=headers, body=body)
+            logger.info(f"Request: {request.start_line}")
+            if body:
+                logger.debug(f"Request Body: {request.body}")
+
             with socket.create_connection((host, port)) as sock:
                 sock.sendall(request.to_bytes())
                 response_data = sock.recv(Request.BUFF_SIZE)
-        except (socket.error, socket.timeout) as e:
-            raise ValueError(f"Network error: {e}")
 
-        response = HTTPResponse.from_bytes(response_data)
-        logger.info(f"Response: {response.start_line}")
-        logger.debug(f"Response Body: {response.body}")
-        return response
+            response = HTTPResponse.from_bytes(response_data)
+            logger.info(f"Response: {response.start_line}")
+            logger.debug(f"Response Body: {response.body}")
+            return response
+
+        except (socket.error, socket.timeout) as err:
+            raise NetworkError(f"Network error: {err}")
+        except Exception as err:
+            raise HTTPRequestError(f"Request failed: {err}")
 
     @staticmethod
     def post(

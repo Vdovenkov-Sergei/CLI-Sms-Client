@@ -1,24 +1,29 @@
 import base64
 import binascii
 
+from exceptions import AuthenticationError
+
 
 class HTTPBasicAuth:
     @staticmethod
     def encode(credentials: tuple[str, str]) -> str:
         if not isinstance(credentials, tuple) or len(credentials) != 2:
-            raise ValueError("Credentials must be a tuple (username, password)")
+            raise AuthenticationError("Credentials must be a tuple (username, password)")
 
         username, password = credentials
         if not isinstance(username, str) or not isinstance(password, str):
-            raise ValueError("Both username and password must be strings")
+            raise AuthenticationError("Both username and password must be strings")
 
-        encoded = base64.b64encode(f"{username}:{password}".encode()).decode()
-        return f"Basic {encoded}"
+        try:
+            encoded = base64.b64encode(f"{username}:{password}".encode()).decode()
+            return f"Basic {encoded}"
+        except Exception as e:
+            raise AuthenticationError(f"Failed to encode credentials: {e}")
 
     @staticmethod
     def decode(auth_header: str) -> tuple[str, str]:
         if not auth_header.startswith("Basic "):
-            raise ValueError("Authorization header should start with 'Basic '")
+            raise AuthenticationError("Authorization header should start with 'Basic '")
 
         encoded_credentials = auth_header[len("Basic ") :]
         try:
@@ -26,10 +31,10 @@ class HTTPBasicAuth:
             decoded_credentials = decoded_bytes.decode()
 
             if ":" not in decoded_credentials:
-                raise ValueError("Decoded credentials must be in the format 'username:password'")
+                raise AuthenticationError("Decoded credentials must be in the format 'username:password'")
 
             username, password = decoded_credentials.split(":", 1)
             return username.strip(), password.strip()
 
         except (binascii.Error, UnicodeDecodeError) as err:
-            raise ValueError(f"Failed to decode 'Authorization' header: {err}")
+            raise AuthenticationError(f"Failed to decode 'Authorization' header: {err}")

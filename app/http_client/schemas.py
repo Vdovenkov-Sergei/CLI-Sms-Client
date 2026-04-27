@@ -3,6 +3,8 @@ import re
 from dataclasses import dataclass
 from typing import Any, Self, get_type_hints
 
+from exceptions import MessageError, PhoneNumberError, SerializationError, ValidationError
+
 
 @dataclass
 class HTTPBody:
@@ -17,16 +19,16 @@ class HTTPBody:
         try:
             instance = cls(**data)
         except TypeError as err:
-            raise ValueError(f"Error initializing {cls.__name__} from dictionary: {err}")
+            raise ValidationError(f"Error initializing {cls.__name__} from dictionary: {err}")
         except ValueError as err:
-            raise ValueError(f"Invalid data for {cls.__name__}: {err}")
+            raise ValidationError(f"Invalid data for {cls.__name__}: {err}")
         return instance
 
     def to_json(self) -> str:
         try:
             return json.dumps(self.to_dict(), ensure_ascii=False)
         except TypeError as err:
-            raise ValueError(f"Error serializing body to JSON: {err}")
+            raise SerializationError(f"Error serializing body to JSON: {err}")
 
     def validate(self) -> None:
         pass
@@ -37,9 +39,9 @@ class PhoneNumber:
 
     def __init__(self, phone: str):
         if not isinstance(phone, str):
-            raise ValueError(f"Phone number must be a string, got {type(phone)}")
+            raise PhoneNumberError(f"Phone number must be a string, got {type(phone)}")
         if not self.is_valid_phone(phone):
-            raise ValueError(f"Invalid phone number: {phone}")
+            raise PhoneNumberError(f"Invalid phone number: {phone}")
         self.phone = phone
 
     def __str__(self) -> str:
@@ -61,6 +63,6 @@ class SMSMessage(HTTPBody):
         for field, expected_type in annotations.items():
             value = getattr(self, field)
             if not isinstance(value, expected_type):
-                raise ValueError(f"Field '{field}' must be of type {expected_type}, but got {type(value)}")
+                raise ValidationError(f"Field '{field}' must be of type {expected_type}, but got {type(value)}")
         if not self.message.strip():
-            raise ValueError("Message cannot be empty")
+            raise MessageError("Message cannot be empty")

@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Optional, Self
 
 from auth.basic_auth import HTTPBasicAuth
+from exceptions import HTTPMessageError, HTTPRequestError, HTTPResponseError
 
 
 class HTTPMessage(ABC):
@@ -35,11 +36,11 @@ class HTTPMessage(ABC):
         try:
             data = binary_data.decode()
         except UnicodeDecodeError:
-            raise ValueError("Failed to decode binary data.")
+            raise HTTPMessageError("Failed to decode binary data.")
 
         lines = data.split("\r\n")
         if not lines or not lines[0]:
-            raise ValueError("Invalid message format: No start line found.")
+            raise HTTPMessageError("Invalid message format: No start line found.")
 
         start_line, *lines = lines
         headers, body = {}, ""
@@ -50,7 +51,7 @@ class HTTPMessage(ABC):
                 key, value = line.split(": ", 1)
                 headers[key] = value
         except ValueError:
-            raise ValueError("Invalid header format. Expected 'key: value'.")
+            raise HTTPMessageError("Invalid header format. Expected 'key: value'.")
 
         if blank_line_idx + 1 < len(lines):
             body = "\r\n".join(lines[blank_line_idx + 1 :])
@@ -93,12 +94,12 @@ class HTTPRequest(HTTPMessage):
 
         parts = start_line.split(" ", 2)
         if len(parts) != 3:
-            raise ValueError(f"Invalid start line format: {start_line}")
+            raise HTTPRequestError(f"Invalid start line format: {start_line}")
 
         method, path, _ = parts
         host = headers.get("Host")
         if not host:
-            raise ValueError("Missing 'Host' header in the request.")
+            raise HTTPRequestError("Missing 'Host' header in the request.")
 
         auth = None
         if "Authorization" in headers:
@@ -130,7 +131,12 @@ class HTTPResponse(HTTPMessage):
 
         parts = start_line.split(" ", 2)
         if len(parts) != 3:
-            raise ValueError(f"Invalid start line format: {start_line}")
-        _, status_code, status_message = parts
+            raise HTTPResponseError(f"Invalid start line format: {start_line}")
+        _, status_code_str, status_message = parts
 
-        return cls(int(status_code), status_message, headers=headers, body=body)
+        try:
+            status_code = int(status_code_str)
+        except ValueError:
+            raise HTTPResponseError(f"Invalid status code: {status_code}")
+
+        return cls(status_code, status_message, headers=headers, body=body)
