@@ -7,8 +7,8 @@ from rich.table import Table
 console = Console()
 
 
-def print_sms_response(response: HTTPResponse) -> None:
-    table = Table(title="\nSMS Response", show_header=True, header_style="cyan")
+def print_response(title: str, response: HTTPResponse) -> None:
+    table = Table(title=title, show_header=True, header_style="cyan")
     status_style = "green" if response.status_code < 400 else "red"
     table.add_column("Status Code", style=status_style)
     table.add_column("Response Body", style="yellow")
