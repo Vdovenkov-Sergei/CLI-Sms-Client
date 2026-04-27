@@ -1,9 +1,10 @@
 import json
-import socket
 import re
+import socket
 from typing import Any, Optional, Union
-from http_client.schemas import HTTPBody
+
 from http_client.http_message import HTTPRequest, HTTPResponse
+from http_client.schemas import HTTPBody
 from utils.logging import logger
 
 
@@ -37,7 +38,7 @@ class Request:
 
     @staticmethod
     def prepare_body(body: Optional[Union[HTTPBody, dict[str, Any], str]]) -> tuple[str, dict[str, str]]:
-        headers = {}
+        headers: dict[str, str] = {}
         if isinstance(body, dict):
             try:
                 body = json.dumps(body)

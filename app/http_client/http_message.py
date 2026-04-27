@@ -42,7 +42,7 @@ class HTTPMessage(ABC):
             raise ValueError("Invalid message format: No start line found.")
 
         start_line, *lines = lines
-        headers, body = {}, None
+        headers, body = {}, ""
         blank_line_idx = lines.index("") if "" in lines else len(lines)
 
         try:

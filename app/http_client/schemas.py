@@ -1,12 +1,12 @@
-from dataclasses import dataclass
 import json
 import re
+from dataclasses import dataclass
 from typing import Any, Self, get_type_hints
 
 
 @dataclass
 class HTTPBody:
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.validate()
 
     def to_dict(self) -> dict[str, Any]:

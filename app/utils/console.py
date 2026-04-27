@@ -1,12 +1,13 @@
-from rich.console import Console
-from rich.table import Table
 import json
 
+from http_client.http_message import HTTPResponse
+from rich.console import Console
+from rich.table import Table
 
 console = Console()
 
 
-def print_sms_response(response):
+def print_sms_response(response: HTTPResponse) -> None:
     table = Table(title="\nSMS Response", show_header=True, header_style="cyan")
     status_style = "green" if response.status_code < 400 else "red"
     table.add_column("Status Code", style=status_style)
