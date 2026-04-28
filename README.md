@@ -1,54 +1,68 @@
-# SMS CLI Client
+# SMS Client
 
-This is a command-line tool for sending SMS messages via an API. It supports configuration via a `TOML` file, logs requests and responses, and provides a user-friendly console output using `rich`.
+![python](https://img.shields.io/badge/python-3.11+-3776AB?logo=python&logoColor=white)
+![poetry](https://img.shields.io/badge/poetry-2.0+-60A5FA?logo=poetry&logoColor=white)
+![isort](https://img.shields.io/badge/isort-imports-EF8336)
+![ruff](https://img.shields.io/badge/ruff-lint-D7FF64?logo=ruff&logoColor=black)
+![mypy](https://img.shields.io/badge/mypy-typed-2A6DB2)
+![pytest](https://img.shields.io/badge/pytest-tested-0A9EDC?logo=pytest&logoColor=white)
 
-## Installation and Configuration
+A CLI tool for sending SMS messages via an HTTP API. Communicates over raw TCP sockets with a hand-rolled `HTTP/1.1` implementation.
+
+## Installation & Configuration
 
 1. Clone the repository: `git clone <repository-url>`
 2. Create a virtual environment and install dependencies: `poetry install --no-root`
 3. Configure the application by creating a `config.toml` file in the root directory:
-   ```toml
-   api_url = "http://localhost:4010/send_sms"
-   username = "your_username"
-   password = "your_password"
-   ```
+```toml
+api_url  = "http://localhost:8888/sms"
+username = "your_username"
+password = "your_password"
+```
 
-## Running the Application
+| Key        | Type     | Description                      |
+|------------|----------|----------------------------------|
+| `api_url`  | `string` | Full URL of the SMS API endpoint |
+| `username` | `string` | HTTP Basic Auth username         |
+| `password` | `string` | HTTP Basic Auth password         |
 
-To run the program, use the following command:
+## Usage
 
 ```sh
-make run SENDER="Sender" RECIPIENT="Recipient" MESSAGE="Message"
+python -m app.main \
+  --sender "+12025550001" \
+  --recipient "+12025550002" \
+  --message "Hello!"
 ```
 
-You need to provide three arguments:
-- `SENDER`: The sender's phone number.
-- `RECIPIENT`: The recipient's phone number.
-- `MESSAGE`: The content of the SMS message
+| Argument      | Description            |
+|---------------|------------------------|
+| `--sender`    | Sender phone number    |
+| `--recipient` | Recipient phone number |
+| `--message`   | SMS text content       |
 
-This command will send the specified SMS from the sender to the recipient.
+Phone numbers must be 10–15 digits, optionally prefixed with `+`.
 
-### Example Output
+### Example output
+
 ```
-+-------------+-----------------------------------------------+
-| Status Code | Response Body                                 |
-+-------------+-----------------------------------------------+
-| 200         | {"status": "success", "message_id": "123456"} |
-+-------------+-----------------------------------------------+
+               SMS Response               
+┏━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Status Code ┃ Response Body            ┃
+┡━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ 200         │ {                        │
+│             │   "status": "success",   │
+│             │   "message_id": "123456" │
+│             │ }                        │
+└─────────────┴──────────────────────────┘
 ```
 
 ## Makefile commands
 
-The `Makefile` provides additional commands for convenience:
-- `make test` to execute the test suite using `pytest`.
-- `make format` to format the code using `black` and `isort`.
-- `make lint` to run `ruff` and `mypy` to check for code issues.
-- `make clean` to remove cache files and temporary build artifacts.
-
-## Logging
-
-All requests and responses are logged to `sms-log.log`. You can view logs using:
-
-```sh
-tail -f sms-log.log
-```
+| Command         | Description                                     |
+|-----------------|-------------------------------------------------|
+| `make test`     | Run the test suite with `pytest`                |
+| `make test-cov` | Run tests with coverage report                  |
+| `make format`   | Format code with `black` and `isort`            |
+| `make lint`     | Run `ruff` and `mypy`                           |
+| `make clean`    | Remove `__pycache__`, coverage, and tool caches |

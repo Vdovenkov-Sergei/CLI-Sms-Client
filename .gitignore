@@ -3,6 +3,9 @@
 # Configuration files
 config.toml
 
+# Application logs
+logs/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

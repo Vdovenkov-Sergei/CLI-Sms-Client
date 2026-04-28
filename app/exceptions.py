@@ -1,62 +1,67 @@
+"""Custom exception hierarchy for the SMS CLI client."""
+
+
 class SMSClientError(Exception):
-    pass
+    """Base exception for all SMS client errors."""
+
+    ...
 
 
 class ConfigError(SMSClientError):
-    """Ошибки конфигурации"""
+    """Raised when configuration is missing, unreadable, or malformed."""
 
-    pass
+    ...
 
 
 class NetworkError(SMSClientError):
-    """Ошибки сетевого взаимодействия"""
+    """Raised on socket-level connection or I/O failures."""
 
-    pass
+    ...
 
 
 class ValidationError(SMSClientError):
-    """Ошибки валидации данных"""
+    """Raised when input data fails validation rules."""
 
-    pass
+    ...
 
 
 class AuthenticationError(SMSClientError):
-    """Ошибки аутентификации"""
+    """Raised on authentication failures (encoding, decoding, or invalid credentials)."""
 
-    pass
+    ...
 
 
 class HTTPMessageError(SMSClientError):
-    """Базовое исключение для ошибок HTTP сообщений"""
+    """Base exception for HTTP message parsing and construction errors."""
 
-    pass
+    ...
 
 
 class HTTPRequestError(HTTPMessageError):
-    """Ошибки при работе с HTTP запросами"""
+    """Raised when an HTTP request cannot be built or sent."""
 
-    pass
+    ...
 
 
 class HTTPResponseError(HTTPMessageError):
-    """Ошибки при работе с HTTP ответами"""
+    """Raised when an HTTP response cannot be parsed or is structurally invalid."""
 
-    pass
+    ...
 
 
 class PhoneNumberError(ValidationError):
-    """Ошибки, связанные с номером телефона"""
+    """Raised when a phone number does not match the expected format."""
 
-    pass
+    ...
 
 
 class MessageError(ValidationError):
-    """Ошибки, связанные с текстом сообщения"""
+    """Raised when an SMS message text is invalid (e.g. blank)."""
 
-    pass
+    ...
 
 
 class SerializationError(SMSClientError):
-    """Ошибки сериализации/десериализации данных"""
+    """Raised when JSON serialisation or deserialisation fails."""
 
-    pass
+    ...

@@ -1,25 +1,25 @@
-MAIN_APP = app.main
-SRC_CODE_DIR = app/
-POETRY_CMD = poetry run
-EXCLUDE = 
+SRC_DIR = app/
+POETRY = poetry run
 
-.PHONY: format run test lint clean
+.PHONY: format lint test test-cov clean
 
 format:
-	$(POETRY_CMD) black $(SRC_CODE_DIR) --exclude=$(EXCLUDE)
-	$(POETRY_CMD) isort $(SRC_CODE_DIR) --skip=$(EXCLUDE)
-
-run:
-	$(POETRY_CMD) python -m $(MAIN_APP) --sender "$(SENDER)" --recipient "$(RECIPIENT)" --message "$(MESSAGE)"
-
-test:
-	$(POETRY_CMD) python -m pytest -k "$(TEST_NAME)" -m "$(MARKERS)" -q --cov=$(SRC_CODE_DIR) --cov-report=term-missing --import-mode=append
+	$(POETRY) black $(SRC_DIR)
+	$(POETRY) isort $(SRC_DIR)
 
 lint:
-	$(POETRY_CMD) ruff check $(SRC_CODE_DIR) --exclude=$(EXCLUDE)
-	$(POETRY_CMD) mypy $(SRC_CODE_DIR) $(if $(EXCLUDE),--exclude=$(EXCLUDE))
+	$(POETRY) ruff check $(SRC_DIR)
+	$(POETRY) mypy $(SRC_DIR)
+
+test:
+	$(POETRY) python -m pytest
+
+test-cov:
+	$(POETRY) python -m pytest --cov=$(SRC_DIR) --cov-report=term-missing
 
 clean:
-	find . -type d -name "__pycache__" ! -path "./.venv/*" -exec rm -rf {} +
-	find . -type f \( -name "*.pyc" -o -name "*.pyo" -o -name "*.pyd" \) ! -path "./.venv/*" -delete
-	rm -rf .coverage .pytest_cache .mypy_cache .ruff_cache
+	find . -type d -name "__pycache__" ! -path "./.venv/*" -exec rm -r {} + 2>/dev/null || true
+	find . -type f -name "*.pyc" ! -path "./.venv/*" -delete 2>/dev/null || true
+	find . -type f -name "*.pyo" ! -path "./.venv/*" -delete 2>/dev/null || true
+	find . -type f -name "*.pyd" ! -path "./.venv/*" -delete 2>/dev/null || true
+	rm -rf .pytest_cache .mypy_cache .ruff_cache .coverage 2>/dev/null || true

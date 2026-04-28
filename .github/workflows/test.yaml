@@ -1,4 +1,4 @@
-name: Run Tests
+name: Test Code
 
 on:
   push:
@@ -11,25 +11,23 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    name: Run tests with pytest
+    name: Run tests
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Install Poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
-          export PATH="$HOME/.poetry/bin:$PATH"
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Install dependencies
-        run: |
-          poetry install --no-root
+        run: poetry install --no-root
 
       - name: Run tests
-        run: |
-          poetry run python -m pytest -q --cov=app --cov-report=term-missing
+        run: poetry run python -m pytest --cov=app/ --cov-report=term-missing
